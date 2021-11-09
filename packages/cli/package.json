@@ -1,6 +1,6 @@
 {
   "name": "@eminemjs/cli",
-  "version": "0.7.0",
+  "version": "1.2.1",
   "description": "em-cli",
   "author": "wyyufeng <wyyufeng@gmail.com>",
   "homepage": "",
@@ -17,14 +17,17 @@
     "index.js"
   ],
   "dependencies": {
-    "chalk": "^4.0.0",
-    "commander": "^5.0.0",
-    "cross-env": "^7.0.2",
-    "cross-spawn": "^7.0.2",
-    "fs-extra": "^9.0.0",
-    "inquirer": "^7.1.0",
+    "chalk": "^4.1.1",
+    "commander": "^7.2.0",
+    "cross-env": "^7.0.3",
+    "cross-spawn": "^7.0.3",
+    "fork-ts-checker-webpack-plugin": "^6.2.10",
+    "fs-extra": "^10.0.0",
+    "inquirer": "^8.1.0",
+    "log-symbols": "^5.0.0",
+    "sharp": "^0.28.3",
     "validate-npm-package-name": "^3.0.0",
-    "webpack-log": "^3.0.1"
+    "webpack-log": "^3.0.2"
   },
-  "gitHead": "f3b7cf24bb356ad3a49a3cbee0d65312f22c02b3"
+  "gitHead": "e23d3e340f2d57f68b7a60ba99aa805c02acd634"
 }

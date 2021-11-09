@@ -1,7 +1,7 @@
+'use strict';
 const fs = require('fs');
 const path = require('path');
 const Context = require('./Context');
-const extensions = require('./extensions');
 const appDirectory = fs.realpathSync(process.cwd());
 const resolvePath = (relativePath) => {
     return path.resolve(appDirectory, relativePath);
@@ -9,39 +9,21 @@ const resolvePath = (relativePath) => {
 
 const isFunction = (source) => typeof source === 'function';
 class WebpackFinalConfig {
-    constructor(scriptsArgs) {
-        const NODE_ENV = process.env.NODE_ENV;
-        if (!NODE_ENV) {
-            throw new Error('The NODE_ENV environment variable is required but was not specified.');
-        }
-        this.NODE_ENV = NODE_ENV;
+    constructor(scriptsOptions, paths) {
         this.configPath = resolvePath('.emrc.js');
         const userConfig = require(this.configPath);
 
-        this.config = userConfig;
-
-        this.extensions = extensions;
+        this.userConfig = userConfig;
+        this.options = scriptsOptions;
 
         this.middlewareMap = new Map();
-        const paths = this.setupPaths();
-        const contextOptions = {
-            paths: paths,
-            env: this.parseEnv(paths),
-            apps: userConfig.apps,
-            shouldUseSourceMap: userConfig.sourceMap,
-            strict: typeof userConfig.strict === 'undefined' ? true : userConfig.strict,
-            ...scriptsArgs
-        };
-        this.context = new Context(
-            NODE_ENV,
-            contextOptions,
-            contextOptions.paths,
-            extensions,
-            contextOptions.env
-        );
+        this.paths = paths;
+        const env = this.parseEnv(this.paths.dotEnv);
+        const config = Object.assign(this.userConfig, { env: env }, scriptsOptions);
+        this.context = new Context(process.env.NODE_ENV, this.paths, config);
     }
-    parseEnv(paths) {
-        const dotenvFiles = [`${paths.dotEnv}.${this.NODE_ENV}`].filter(Boolean);
+    parseEnv(dotEnvPath) {
+        const dotenvFiles = [`${dotEnvPath}.${process.env.NODE_ENV}`].filter(Boolean);
         dotenvFiles.forEach((dotenvFile) => {
             if (fs.existsSync(dotenvFile)) {
                 require('dotenv-expand')(
@@ -62,8 +44,9 @@ class WebpackFinalConfig {
                     return env;
                 },
                 {
-                    NODE_ENV: process.env.NODE_ENV || 'development'
-                    // PUBLIC_URL: publicUrl
+                    NODE_ENV: process.env.NODE_ENV || 'development',
+                    APP_VERSION: this.options.version,
+                    APP_NAME: this.options.appName
                 }
             );
         const stringified = {
@@ -78,27 +61,9 @@ class WebpackFinalConfig {
             stringified
         };
     }
-    setupPaths() {
-        const paths = {};
-        paths.appSource = resolvePath('src');
-        paths.appPublic = resolvePath('public');
-        paths.appOutput = resolvePath('build');
-        paths.nodeModules = resolvePath('node_modules');
-        paths.dotEnv = resolvePath('.env');
-        return paths;
-    }
-    getRegexFromExt(type) {
-        if (typeof type === 'undefined') {
-            return Object.keys(this.extensions).map((_type) => {
-                return this.getRegexFromExt(_type);
-            });
-        }
-        const extensions = this.extensions[type];
-        if (extensions.length === 1) return new RegExp(String.raw`\.${extensions[0]}$`);
-        return new RegExp(String.raw`\.(${extensions.join('|')})$`);
-    }
+
     computeFinalContext() {
-        const { use } = this.config;
+        const { use } = this.userConfig;
 
         // 如果是函数，将重写整个context
         try {
@@ -114,6 +79,7 @@ class WebpackFinalConfig {
             }
         } catch (error) {
             console.error('\nAn error occurred when loading the middleware.\n');
+            console.log();
             console.error(error);
             process.exit(1);
         }

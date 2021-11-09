@@ -1,50 +1,53 @@
+'use strict';
+process.on('unhandledRejection', (err) => {
+    throw err;
+});
 process.env.BABEL_ENV = 'production';
 process.env.NODE_ENV = 'production';
+const paths = require('../core/paths');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const path = require('path');
-const formatMessages = require('webpack-format-messages');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const flatten = require('array-flatten').flatten;
 const filesize = require('filesize');
 const gzipSize = require('gzip-size');
 const version = require('../util/version');
-const clearConsole = require('../util/clearConsole');
+const clearConsole = require('react-dev-utils/clearConsole');
 
 const WARN_AFTER_BUNDLE_SIZE = 250 * 1024; //kb
 
-process.on('unhandledRejection', (err) => {
-    throw err;
-});
-const { WebpackFinalConfig } = require('@eminemjs/core');
-const createCompiler = require('../util/createCompiler');
+const WebpackFinalConfig = require('../core/WebpackFinalConfig');
+const createBuildCompiler = require('../util/createBuildCompiler');
 const options = {};
 function setupOptions() {
-    options.isEnvProduction = true;
-    options.isEnvDevelopment = false;
-    options.version = version.nextVersion();
+    options.buildVersion = version.nextVersion();
 }
 setupOptions();
-
+const useTypescript = fs.existsSync(paths.tsConfig);
+options.useTypescript = useTypescript;
 function build() {
-    const webpackFinalCompiler = new WebpackFinalConfig(options);
-    const finalConfig = webpackFinalCompiler.toWebpack();
-    const compiler = createCompiler(finalConfig);
+    const webpackFinalConfig = new WebpackFinalConfig(options, paths);
+    const finalConfig = webpackFinalConfig.toWebpack();
+    const compiler = createBuildCompiler(finalConfig);
     console.log(chalk.blueBright('start building...'));
 
     compiler.run((err, stats) => {
         clearConsole();
         if (err) {
-            console.log(`build failed...(T＿T)`);
+            console.log(chalk.red('Failed to compile.\n'));
             console.log(err);
             process.exit(1);
         }
-        const messages = formatMessages(stats);
+        const messages = formatWebpackMessages(
+            stats.toJson({ all: false, warnings: true, errors: true })
+        );
         if (stats.hasErrors()) {
             console.log(chalk.redBright('Failed to build.'));
             messages.errors.forEach((e) => console.log(e));
             return;
         }
-        printFileSize(webpackFinalCompiler.context.paths.appOutput);
+        printFileSize(webpackFinalConfig.paths.appOutput);
         version.incBuildVersion();
         console.log('build complete！(oﾟ▽ﾟ)o  ');
 
@@ -67,7 +70,12 @@ function build() {
     });
 }
 
-build();
+try {
+    build();
+} catch (error) {
+    console.log(chalk.red('Failed to compile.\n'));
+    console.log(error);
+}
 
 function printFileSize(dir) {
     const fileSizes = measureFileSize(dir);

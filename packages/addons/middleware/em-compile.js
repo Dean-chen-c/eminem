@@ -1,9 +1,10 @@
-module.exports = function ({ language, useTypeScript, ...others }) {
+'use strict';
+module.exports = function () {
     return (context) => {
         context.module
 
-            .rule('compile')
-            .test(context.getRegexFromExt(language))
+            .rule('babel')
+            .test(/\.(js|mjs|jsx|ts|tsx)$/)
             .include.add(context.paths.appSource)
             .end()
             .use('babel-loader')
@@ -11,17 +12,7 @@ module.exports = function ({ language, useTypeScript, ...others }) {
             .options({
                 cacheDirectory: true,
                 cacheCompression: false,
-                compact: context.options.isEnvProduction,
-                presets: [
-                    [
-                        require('@eminemjs/babel-preset'),
-                        {
-                            react: language === 'javascriptreact',
-                            useTypeScript
-                        }
-                    ]
-                ],
-                ...others
+                compact: context.isEnvProduction
             });
 
         return context;

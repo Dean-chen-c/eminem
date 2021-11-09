@@ -1,19 +1,22 @@
+'use strict';
 const web = require('./web');
-const merge = require('lodash.merge');
-const react = (opts = {}) => (context) => {
-    const options = merge(
+const svg = require('../middleware/em-svgr');
+
+const react = (options = { publicPath: '/', svgr: true }) => (context) => {
+    const { publicPath, svgr } = Object.assign(
         {
-            babel: {
-                language: 'javascriptreact'
-            },
-            eslint: {
-                language: 'javascriptreact',
-                baseConfig: { extends: ['eslint:recommended', 'plugin:react/recommended'] }
-            }
+            publicPath: '/',
+            svgr: true
         },
-        opts
+        options
     );
-    web(options)(context);
+
+    web({
+        publicPath
+    })(context);
+    if (svgr) {
+        svg()(context);
+    }
     return context;
 };
 module.exports = react;

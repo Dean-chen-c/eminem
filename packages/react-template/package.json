@@ -1,6 +1,6 @@
 {
   "name": "@eminemjs/react-template",
-  "version": "0.7.0",
+  "version": "1.2.1",
   "description": "em-template",
   "author": "wyyufeng <wyyufeng@gmail.com>",
   "homepage": "",
@@ -12,5 +12,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "f3b7cf24bb356ad3a49a3cbee0d65312f22c02b3"
+  "gitHead": "e23d3e340f2d57f68b7a60ba99aa805c02acd634",
+  "dependencies": {
+    "fork-ts-checker-webpack-plugin": "^5.2.0",
+    "log-symbols": "^4.0.0",
+    "sharp": "^0.26.0"
+  }
 }

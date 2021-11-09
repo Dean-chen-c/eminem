@@ -1,6 +1,6 @@
 {
   "name": "@eminemjs/babel-preset",
-  "version": "0.7.0",
+  "version": "1.2.1",
   "description": "babel preset for eminemjs",
   "author": "wyyufeng <wyyufeng@gmail.com>",
   "homepage": "https://github.com/wyyufeng/eminem#readme",
@@ -21,18 +21,7 @@
     "url": "https://github.com/wyyufeng/eminem/issues"
   },
   "dependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.3",
-    "@babel/plugin-proposal-optional-chaining": "^7.9.0",
-    "@babel/plugin-transform-react-display-name": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-react": "^7.9.4",
-    "@babel/runtime": "^7.9.6",
-    "babel-eslint": "^10.1.0",
-    "babel-plugin-macros": "^2.8.0",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24"
+    "babel-preset-react-app": "^10.0.0"
   },
-  "gitHead": "52fdf1b58fe14ab984e8d14522861c45167018be"
+  "gitHead": "e23d3e340f2d57f68b7a60ba99aa805c02acd634"
 }
